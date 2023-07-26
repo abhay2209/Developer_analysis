@@ -1,6 +1,9 @@
 DATA_PATH: str = "data_compressed.zip"
 FILENAME: str = "survey_results_public.csv"
 
+NORTH_AMERICA_DATA: str = "north_america"
+REST_OF_THE_WORLD_DATA: str = "rest_of_the_world"
+
 # Keep Columns
 KEEP_COLUMNS: list = [
     'MainBranch', 'Age', 'Employment', 'RemoteWork', 
@@ -8,9 +11,8 @@ KEEP_COLUMNS: list = [
     'YearsCodePro', 'DevType', 'OrgSize', 'Country',
     'Currency', 'CompTotal', 'LanguageHaveWorkedWith',
     'DatabaseHaveWorkedWith','PlatformHaveWorkedWith',
-    'WebframeHaveWorkedWith', 'MiscTechHaveWorkedWith','ToolsTechHaveWorkedWith',
-    'OfficeStackAsyncHaveWorkedWith', 'AISent','AISelect', 
-    'AIToolCurrently Using','WorkExp', 'ProfessionalTech', 
+    'WebframeHaveWorkedWith', 'MiscTechHaveWorkedWith','ToolsTechHaveWorkedWith', 
+    'AISent','AISelect', 'AIToolCurrently Using','WorkExp', 'ProfessionalTech', 
     'Industry'
 ]
 
@@ -21,7 +23,15 @@ EMPLOYMENT_TYPE: str = 'Employment'
 CURRENCY: str = 'Currency'
 COMPENSATION: str = 'CompTotal'
 LANGUAGES: str = 'LanguageHaveWorkedWith'
+DATABASES: str = 'DatabaseHaveWorkedWith'
+PLATFORMS: str = 'PlatformHaveWorkedWith'
+FRAMEWORKS: str = 'WebframeHaveWorkedWith'
+TOOLS: str = 'ToolsTechHaveWorkedWith'
+OTHER_TECH: str = 'MiscTechHaveWorkedWith'
+AISENT: str = 'AISent'
+USING_AI: str = 'AIToolCurrently Using'
 
+DROP_TECHNOLOGIES_LIST: list = [LANGUAGES, DATABASES, FRAMEWORKS, PLATFORMS, TOOLS, OTHER_TECH, USING_AI]
 
 # Data
 EMPLOYED_FULL_TIME: str = 'Employed, full-time' 
@@ -30,9 +40,14 @@ DEVELOPERS: str = 'I am a developer by profession'
 USA: str = 'United States of America'
 CANADA: str = 'Canada'
 CANADA_CURRENCY: str = "CAD"
+TOP_10_LANG: int = 10
+TOP_10_DATABASE: int = 10
+TOP_10_PLATFORM: int = 10
+TOP_10_FRAMEWORKS: int = 10
+TOP_10_TOOLS: int = 10
+TOP_10_OTHER_TECH: int = 10
 
 # Canadian currency rates
-
 CURRENCY_CONVERSION_RATE: dict = {'EUR': 0.6962818548948615, 'USD': 0.7505918395766608, 'JPY': 104.609385879404,
   'BGN': 1.36178805180337, 'CZK': 16.47820637794179, 'DKK': 5.187647959894165, 
   'GBP': 0.5973750174070463, 'HUF': 256.74000835538226, 'PLN': 3.1057652137585294,
@@ -46,6 +61,11 @@ CURRENCY_CONVERSION_RATE: dict = {'EUR': 0.6962818548948615, 'USD': 0.7505918395
   'AED': 0.36, 'ILS': 0.35, 'PKR': 0.0046
 }
 
-REST_OF_WORLD_CURRENCY_NA = ['AZN', 'JMD', 'KHR', 'TWD', 'MRU', 'BTN', 'MWK', 'FJD', 'MKD', 'MVR', 'TND', 'QAR', 'COP', 'AWG', 'GIP', 'NPR', 'BHD', 'MDL', 'SYP', 'GYD', 'MZN', 'XOF', 'AMD', 'BND', 'MUR', 'CDF', 'MMK', 'CRC', 'NAD', 'BDT', 'LBP', 'PEN', 'TMT', 'LSL', 'TZS', 'VES', 'RWF', 'EGP', 'JOD', 'SLL', 'PYG', 'KWD', 'LKR', 'KES', 'RUB', 'UZS', 'MNT', 'BOB', 'BZD', 'TTD', 'ALL', 'XAF', 'MOP', 'SRD', 'BBD', 'SAR', 'SSP', 'ARS', 'LAK', 'HRK', 'VND', 'MAD', 'AOA', 'IQD', 'CUP', 'PKR', 'CVE', 'GTQ', 'UGX', 'YER', 'IRR', 'CLP', 'ZMW', 'DZD', 'GHS', 'KGS', 'BAM', 'GEL', 'UYU', 'HNL', 'NGN', 'IMP', 'AFN', 'NIO', 'BYN', 'OMR', 'MGA', 'RSD', 'KZT', 'ETB', 'DOP']
+REST_OF_WORLD_CURRENCY_NA = ['AZN', 'JMD', 'KHR', 'TWD', 'MRU', 'BTN', 'MWK', 'FJD', 'MKD', 'MVR', 'TND', 'QAR', 'COP', 'AWG', 'GIP', 'NPR', 
+                             'BHD', 'MDL', 'SYP', 'GYD', 'MZN', 'XOF', 'AMD', 'BND', 'MUR', 'CDF', 'MMK', 'CRC', 'NAD', 'BDT', 'LBP', 'PEN', 
+                             'TMT', 'LSL', 'TZS', 'VES', 'RWF', 'EGP', 'JOD', 'SLL', 'PYG', 'KWD', 'LKR', 'KES', 'RUB', 'UZS', 'MNT', 'BOB', 
+                             'BZD', 'TTD', 'ALL', 'XAF', 'MOP', 'SRD', 'BBD', 'SAR', 'SSP', 'ARS', 'LAK', 'HRK', 'VND', 'MAD', 'AOA', 'IQD', 
+                             'CUP', 'PKR', 'CVE', 'GTQ', 'UGX', 'YER', 'IRR', 'CLP', 'ZMW', 'DZD', 'GHS', 'KGS', 'BAM', 'GEL', 'UYU', 'HNL', 
+                             'NGN', 'IMP', 'AFN', 'NIO', 'BYN', 'OMR', 'MGA', 'RSD', 'KZT', 'ETB', 'DOP']
 
 
