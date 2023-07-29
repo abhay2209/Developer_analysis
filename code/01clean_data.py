@@ -90,6 +90,7 @@ def main():
     rest_of_the_world.drop(columns=cs.DROP_TECHNOLOGIES_LIST, axis=1)
     
     # What is the top paying skill in each category?
+    
 
     # How do these skills correlate with each other?
     

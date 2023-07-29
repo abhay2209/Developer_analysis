@@ -22,6 +22,8 @@ COUNTRY: str = 'Country'
 EMPLOYMENT_TYPE: str = 'Employment'
 CURRENCY: str = 'Currency'
 COMPENSATION: str = 'CompTotal'
+WORK_EXPERIENCE: str = 'WorkExp'
+YEARS_CODE_PRO: str = 'YearsCodePro'
 LANGUAGES: str = 'LanguageHaveWorkedWith'
 DATABASES: str = 'DatabaseHaveWorkedWith'
 PLATFORMS: str = 'PlatformHaveWorkedWith'
@@ -30,6 +32,7 @@ TOOLS: str = 'ToolsTechHaveWorkedWith'
 OTHER_TECH: str = 'MiscTechHaveWorkedWith'
 AISENT: str = 'AISent'
 USING_AI: str = 'AIToolCurrently Using'
+JOB_TITLE: str = 'DevType'
 
 DROP_TECHNOLOGIES_LIST: list = [LANGUAGES, DATABASES, FRAMEWORKS, PLATFORMS, TOOLS, OTHER_TECH, USING_AI]
 
@@ -46,6 +49,13 @@ TOP_10_PLATFORM: int = 10
 TOP_10_FRAMEWORKS: int = 10
 TOP_10_TOOLS: int = 10
 TOP_10_OTHER_TECH: int = 10
+INCOME_THRESHOLD: int = 400000
+DEVELOPER_MOBILE: str = 'Developer, mobile'
+DEVELOPER_FULLSTACK: str = 'Developer, full-stack'
+
+CHOSEN_JOB_TITLES: int = ['Research & Development role', 'Data scientist or machine learning specialist', 'Developer, full-stack', 'Data or business analyst', 
+                          'Developer, front-end', 'Engineering manager', 'Engineer, data', 'Developer, game or graphics', 'Developer, embedded applications or devices',
+                          'Developer, mobile', 'Database administrator']
 
 # Canadian currency rates
 CURRENCY_CONVERSION_RATE: dict = {'EUR': 0.6962818548948615, 'USD': 0.7505918395766608, 'JPY': 104.609385879404,
@@ -68,4 +78,21 @@ REST_OF_WORLD_CURRENCY_NA = ['AZN', 'JMD', 'KHR', 'TWD', 'MRU', 'BTN', 'MWK', 'F
                              'CUP', 'PKR', 'CVE', 'GTQ', 'UGX', 'YER', 'IRR', 'CLP', 'ZMW', 'DZD', 'GHS', 'KGS', 'BAM', 'GEL', 'UYU', 'HNL', 
                              'NGN', 'IMP', 'AFN', 'NIO', 'BYN', 'OMR', 'MGA', 'RSD', 'KZT', 'ETB', 'DOP']
 
+CHOSEN_JOB_GRAPHS: list = ['Data scientist or machine learning specialist', 'Engineering manager']
 
+# Plot labels
+COMPENSATION_LABEL: str = 'Compensation'
+WORK_EXPERIENCE_LABEL: str = 'Work Experience'
+YEARS_OF_CODE_LABEL:str = "Years of Coding"
+AI_SENT_LABEL: str = "AI Sentiment"
+JOB_TITLE_LABEL: str = 'Job title'
+
+# Output filenames
+EXP_VS_COMP: str = "01-yoe-income"
+# EXP_VS_COMP_CAN: str = "01-yoe-income-can"
+EXP_VS_JOBTITLE: str = "02-yoe-vs job"
+EXP_VS_COMP_US_MOBILE: str = "01-yoe-income-us-mobile"
+EXP_VS_COMP_US_FULLSTACK: str = "01-yoe-income-us-fullstack"
+
+# Output folders
+DIAGRAM_OUTPUT_FOLDER: str = "./diagrams"
