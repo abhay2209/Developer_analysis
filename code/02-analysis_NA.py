@@ -30,9 +30,9 @@ def plotLinearRegression(x_data, y_data, x_label: str, y_label: str, graph_name:
 def main():
     na_data = load_data(cs.NORTH_AMERICA_DATA)
     # rof_data = load_data(cs.NORTH_AMERICA_DATA)
+    na_data = na_data[(na_data[cs.COMPENSATION] < cs.INCOME_THRESHOLD)]
+
     na_data[cs.YEARS_CODE_PRO] = pd.to_numeric(na_data[cs.YEARS_CODE_PRO], errors='coerce')
-    # na_data[cs.WORK_EXPERIENCE] = pd.to_numeric(na_data[cs.WORK_EXPERIENCE], errors='coerce')
-    # na_data[cs.COMPENSATION] = pd.to_numeric(na_data[cs.COMPENSATION], errors='coerce')
     regression_data = na_data.dropna(subset=[cs.WORK_EXPERIENCE, cs.COMPENSATION, cs.YEARS_CODE_PRO])
     regression_data = regression_data[(regression_data[cs.COMPENSATION] < cs.INCOME_THRESHOLD)] # Eliminate outliers
 
@@ -70,6 +70,7 @@ def main():
     fullstack_data = regression_data[regression_data[cs.JOB_TITLE] == cs.DEVELOPER_FULLSTACK]
     plotLinearRegression(manager_data[cs.WORK_EXPERIENCE], manager_data[cs.COMPENSATION], cs.WORK_EXPERIENCE_LABEL, cs.COMPENSATION_LABEL, cs.EXP_VS_COMP_US_MOBILE)     
     plotLinearRegression(fullstack_data[cs.WORK_EXPERIENCE], fullstack_data[cs.COMPENSATION], cs.WORK_EXPERIENCE_LABEL, cs.COMPENSATION_LABEL, cs.EXP_VS_COMP_US_FULLSTACK)
+
     
     
         
@@ -83,10 +84,32 @@ def main():
 
     # plotLinearRegression(regression_data[cs.YEARS_CODE], regression_data[cs.COMPENSATION], cs.YEARS_OF_CODE_LABEL)
     
-    # Question 2: Does a developer's sentiment and years of experience correlate to their income?
+    # Question 2: A persons favour of AI + years of experience and comparing to salary ?
     #   
     # Tests used: 
+    ai_data = na_data.dropna(subset=[cs.AISENT, cs.COMPENSATION])
+    outcomes = ai_data[cs.AISENT].unique()
+    outcome_list = []
+    for outcome in outcomes:
+        outcome_df = ai_data[ai_data[cs.AISENT] == outcome].copy()
+        outcome_df = outcome_df[[cs.COMPENSATION]] ** 0.5 # transform as it was skewed towards left and this fixes it
+        outcome_list.append(outcome_df)
 
+    # These graphs are normal therefore could be shown to say data is normal and has many values so we decided to do Anova as mentioned in lecture
+    print(st.normaltest(outcome_list[1])) # this fails so we will say we continuted as a lot of data 
+    plt.hist(outcome_list[1], bins=10)
+    plt.show()
+    
+    anova = st.f_oneway(*outcome_list).pvalue
+    # This was [0.00233371]
+    print(anova)
+    # Therefore some relationship between compensation and favourability to AI, so post-hoc analysis
+    # Perform Tukey's post hoc analysis i.e label values and their labels (favourability and compensation)
+    tukey_result = pairwise_tukeyhsd(ai_data[cs.COMPENSATION], ai_data[cs.AISENT])
+    print(tukey_result)
+
+    # This gave us a relationship between unsure and very favourable therefore we can say we got nothing in regards to compensation
+    # therefore we will remove it
     
         
     # Question 3: How likely will the user adopt AI technologies? And if so, which tools?

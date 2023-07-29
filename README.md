@@ -64,6 +64,11 @@ We found a relationship between the two thus concluding that years of experience
 Nevertheless, we decided to look for other indicators of income. How does years of experience correlate to a developer's seniority/job title? And of course, how significant is the correlation between role and income?
 
 2. A persons favour of AI + years of experience and comparing to salary 
+
+Divided for each outcome and then drew a histogram it was left skewed, so we to square root to fix it. We will show both graphs in report. Then normal test still failed but as we had lots of values, graphed looked normal we did the Anova test.
+P value was less so there was a relationship but in post hoc we found only between Unsure and very favourable so technically nothing
+Concluding it shouldn't have a role in determining compensation and should be removed 
+
 3. How likely will the user adopt AI technologies? And if so, which tools?
 4. For NA does a person know two kind of languages i.e if a person knows Java do they know JavaScript? (KNN) 
 
