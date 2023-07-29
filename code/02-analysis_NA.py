@@ -86,7 +86,7 @@ def main():
     
     # Question 2: A persons favour of AI + years of experience and comparing to salary ?
     #   
-    # Tests used: 
+    # Tests used: This is for salary same could be done for work experience, it also had same results
     ai_data = na_data.dropna(subset=[cs.AISENT, cs.COMPENSATION])
     outcomes = ai_data[cs.AISENT].unique()
     outcome_list = []
@@ -110,6 +110,8 @@ def main():
 
     # This gave us a relationship between unsure and very favourable therefore we can say we got nothing in regards to compensation
     # therefore we will remove it
+
+    # Do the exact same for Q3
     
         
     # Question 3: How likely will the user adopt AI technologies? And if so, which tools?
