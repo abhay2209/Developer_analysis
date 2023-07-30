@@ -1,5 +1,6 @@
 import pandas as pd
 import constants as cs
+import numpy as np
 # import matplotlib.pyplot as plt
 # from forex_python.converter import CurrencyRates
 import zipfile
@@ -26,6 +27,8 @@ def filterData(stackoverflow_data: pd.DataFrame, northAmerica: bool) -> pd.DataF
 def convertCurrencyToCanadian(currency: str, value: float) -> float:
     if(currency in cs.CURRENCY_CONVERSION_RATE):
         return cs.CURRENCY_CONVERSION_RATE[currency] * value
+    else:
+        return np.nan
 
 def getCurrencyCode(data: pd.DataFrame) -> pd.DataFrame:
     data[cs.CURRENCY] = data[cs.CURRENCY].str[:3]
@@ -59,7 +62,9 @@ def main():
         .apply(lambda row: convertCurrencyToCanadian(row[cs.CURRENCY], row[cs.COMPENSATION]), axis=1)
     rest_of_the_world[cs.COMPENSATION] = rest_of_the_world\
         .apply(lambda row: convertCurrencyToCanadian(row[cs.CURRENCY], row[cs.COMPENSATION]), axis=1)
-
+    
+    north_america = north_america.dropna(subset=[cs.COMPENSATION])
+    rest_of_the_world = rest_of_the_world.dropna(subset=[cs.COMPENSATION])
     # Split data into columns (Languages, Databases, Frameworks, Tools, Platforms, Other tech. )
     north_america = pd.concat([north_america, 
                                           splitDataIntoCols(north_america, cs.LANGUAGES, cs.TOP_10_LANG),
@@ -79,12 +84,12 @@ def main():
                                    splitDataIntoCols(rest_of_the_world, cs.OTHER_TECH, cs.TOP_10_OTHER_TECH)], axis = 1)
 
     # How is AI used by devs
-    ai_use_na =  north_america[cs.USING_AI].str.get_dummies(sep=';')    
-    north_america = pd.concat([north_america, ai_use_na], axis =1)
+    # ai_use_na =  north_america[cs.USING_AI].str.get_dummies(sep=';')    
+    # north_america = pd.concat([north_america, ai_use_na], axis =1)
 
-    ai_use_rest = rest_of_the_world[cs.USING_AI].str.get_dummies(sep=';')       
-    rest_of_the_world = pd.concat([rest_of_the_world, ai_use_rest
-                                   ], axis =1)
+    # ai_use_rest = rest_of_the_world[cs.USING_AI].str.get_dummies(sep=';')       
+    # rest_of_the_world = pd.concat([rest_of_the_world, ai_use_rest
+    #                                ], axis =1)
 
     north_america.drop(columns=cs.DROP_TECHNOLOGIES_LIST, axis=1)
     rest_of_the_world.drop(columns=cs.DROP_TECHNOLOGIES_LIST, axis=1)

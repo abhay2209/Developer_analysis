@@ -1,3 +1,5 @@
+from enum import Enum
+
 DATA_PATH: str = "data_compressed.zip"
 FILENAME: str = "survey_results_public.csv"
 
@@ -12,8 +14,7 @@ KEEP_COLUMNS: list = [
     'Currency', 'CompTotal', 'LanguageHaveWorkedWith',
     'DatabaseHaveWorkedWith','PlatformHaveWorkedWith',
     'WebframeHaveWorkedWith', 'MiscTechHaveWorkedWith','ToolsTechHaveWorkedWith', 
-    'AISent','AISelect', 'AIToolCurrently Using','WorkExp', 'ProfessionalTech', 
-    'Industry'
+    'AISent','AISelect','WorkExp', 'ProfessionalTech', 'Industry'
 ]
 
 # Columns
@@ -33,8 +34,10 @@ OTHER_TECH: str = 'MiscTechHaveWorkedWith'
 AISENT: str = 'AISent'
 USING_AI: str = 'AIToolCurrently Using'
 JOB_TITLE: str = 'DevType'
+INDUSTRY: str = 'Industry'
+ORG_SIZE: str = 'OrgSize'
 
-DROP_TECHNOLOGIES_LIST: list = [LANGUAGES, DATABASES, FRAMEWORKS, PLATFORMS, TOOLS, OTHER_TECH, USING_AI]
+DROP_TECHNOLOGIES_LIST: list = [LANGUAGES, DATABASES, FRAMEWORKS, PLATFORMS, TOOLS, OTHER_TECH]
 
 # Data
 EMPLOYED_FULL_TIME: str = 'Employed, full-time' 
@@ -43,19 +46,18 @@ DEVELOPERS: str = 'I am a developer by profession'
 USA: str = 'United States of America'
 CANADA: str = 'Canada'
 CANADA_CURRENCY: str = "CAD"
-TOP_10_LANG: int = 10
-TOP_10_DATABASE: int = 10
-TOP_10_PLATFORM: int = 10
-TOP_10_FRAMEWORKS: int = 10
-TOP_10_TOOLS: int = 10
-TOP_10_OTHER_TECH: int = 10
+TOP_10_LANG: int = 5
+TOP_10_DATABASE: int = 5
+TOP_10_PLATFORM: int = 5
+TOP_10_FRAMEWORKS: int = 5
+TOP_10_TOOLS: int = 5
+TOP_10_OTHER_TECH: int = 5
 INCOME_THRESHOLD: int = 400000
-DEVELOPER_MOBILE: str = 'Developer, mobile'
-DEVELOPER_FULLSTACK: str = 'Developer, full-stack'
 
 CHOSEN_JOB_TITLES: int = ['Research & Development role', 'Data scientist or machine learning specialist', 'Developer, full-stack', 'Data or business analyst', 
                           'Developer, front-end', 'Engineering manager', 'Engineer, data', 'Developer, game or graphics', 'Developer, embedded applications or devices',
-                          'Developer, mobile', 'Database administrator']
+                          'Developer, mobile', 'Database administrator','DevOps specialist', 'Cloud infrastructure engineer']
+
 
 # Canadian currency rates
 CURRENCY_CONVERSION_RATE: dict = {'EUR': 0.6962818548948615, 'USD': 0.7505918395766608, 'JPY': 104.609385879404,
@@ -79,20 +81,48 @@ REST_OF_WORLD_CURRENCY_NA = ['AZN', 'JMD', 'KHR', 'TWD', 'MRU', 'BTN', 'MWK', 'F
                              'NGN', 'IMP', 'AFN', 'NIO', 'BYN', 'OMR', 'MGA', 'RSD', 'KZT', 'ETB', 'DOP']
 
 CHOSEN_JOB_GRAPHS: list = ['Data scientist or machine learning specialist', 'Engineering manager']
+LANGUAGES_LIST: list = ['JavaScript', 'SQL', 'HTML/CSS', 'Python', 'TypeScript', 'Bash/Shell (all shells)', 'C#', 'Java', 'C++', 'PowerShell']
+FRAMEWORK_LIST: list = ['React', 'Node.js', 'jQuery', 'ASP.NET CORE',
+       'Angular', 'Express', 'ASP.NET', 'Next.js', 'Vue.js', 'Flask']
+ALL_FRAMEWORK = ['JavaScript', 'SQL', 'HTML/CSS', 'Python', 'TypeScript',
+       'Bash/Shell (all shells)', 'C#', 'Java', 'C++', 'PowerShell',
+       'PostgreSQL', 'MySQL', 'Microsoft SQL Server', 'SQLite', 'Redis',
+       'MongoDB', 'Elasticsearch', 'Dynamodb', 'MariaDB', 'Oracle', 'Docker',
+       'npm', 'Homebrew', 'Pip', 'Webpack', 'Kubernetes', 'Yarn', 'Make',
+       'NuGet', 'Terraform', 'React', 'Node.js', 'jQuery', 'ASP.NET CORE',
+       'Angular', 'Express', 'ASP.NET', 'Next.js', 'Vue.js', 'Flask',
+       'Amazon Web Services (AWS)', 'Microsoft Azure', 'Google Cloud',
+       'Cloudflare', 'Digital Ocean', 'Heroku', 'Firebase', 'Vercel',
+       'Netlify', 'VMware', '.NET (5+) ', '.NET Framework (1.0 - 4.8)',
+       'Pandas', 'NumPy', 'Apache Kafka', 'Spring Framework', 'RabbitMQ',
+       'React Native', 'Scikit-Learn', 'Torch/PyTorch']
 
 # Plot labels
 COMPENSATION_LABEL: str = 'Compensation'
+COMPENSATION_TRANSFORMED_LABEL: str = 'Compensation Transformed'
+COMPENSATION_AVERAGE_LABEL: str = 'Average Compensation'
 WORK_EXPERIENCE_LABEL: str = 'Work Experience'
 YEARS_OF_CODE_LABEL:str = "Years of Coding"
 AI_SENT_LABEL: str = "AI Sentiment"
 JOB_TITLE_LABEL: str = 'Job title'
+UNFAVOURABLE_LABEL: str = 'Unfavourable'
+FREQUENCY_LABEL: str = 'Frequency'
 
 # Output filenames
+EXP_VS_COMP_OUTLIER: str = 'yoe_vs_income_outliers'
 EXP_VS_COMP: str = "01-yoe-income"
-# EXP_VS_COMP_CAN: str = "01-yoe-income-can"
-EXP_VS_JOBTITLE: str = "02-yoe-vs job"
+EXP_VS_COMP_CAN: str = "01-yoe-income-can"
+EXP_VS_COMP_USA: str = "01-yoe-income-usa"
 EXP_VS_COMP_US_MOBILE: str = "01-yoe-income-us-mobile"
 EXP_VS_COMP_US_FULLSTACK: str = "01-yoe-income-us-fullstack"
+AI_FAV_VS_COMP: str = "02-aifav-vs-comp"
+AI_FAV_VS_COMP_TRANSFORMED: str = "02-aifav-vs-comp-tran"
+CAN_US_COMP_AVERAGE: str = '04-can_vs_us_comp'
+CAN_US_INDUS_AVERAGE: str = '04-can_vs_us_indus'
+CAN_US_ORG_AVG: str = '04-can_vs_us_org_avg'
+CAN_US_ORG_FREQ: str = '04-can_vs_us_org_freq'
+CAN_TUKEY_COMP: str = '04-can_tukey_comp'
+USA_TUKEY_COMP: str = '04-usa_tukey_comp'
 
 # Output folders
 DIAGRAM_OUTPUT_FOLDER: str = "./diagrams"

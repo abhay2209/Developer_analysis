@@ -1,10 +1,13 @@
 import pandas as pd
 import constants as cs
+import numpy as np
 import matplotlib.pyplot as plt
 import zipfile
 from scipy import stats as st
 from sklearn.preprocessing import MinMaxScaler
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
+import statsmodels.api as sm
+from sklearn.decomposition import PCA
 
 import os
 
@@ -15,10 +18,8 @@ def load_data(filename: str) -> pd.DataFrame:
         
 def plotLinearRegression(x_data, y_data, x_label: str, y_label: str, graph_name: str): 
     reg = st.linregress(x_data, y_data)
-    #residuals = y - (reg.slope*x + reg.intercept)
     prediction = reg.slope * x_data + reg.intercept
     print(reg)
-    
     plt.scatter(x_data, y_data, marker='.', color='blue')
     plt.plot(x_data, prediction, 'r-')
     plt.xlabel(x_label)
@@ -26,81 +27,130 @@ def plotLinearRegression(x_data, y_data, x_label: str, y_label: str, graph_name:
     
     plt.savefig(f"{cs.DIAGRAM_OUTPUT_FOLDER}/{graph_name}.png")
     plt.close()
-        
+
+def plotHistogram(data, x_label: str, y_label, title: str, graph_name: str):
+    plt.hist(data, bins=12)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.title(title)
+    plt.savefig(f"{cs.DIAGRAM_OUTPUT_FOLDER}/{graph_name}.png")
+    plt.close()
+
+def plotAnovaAverageSalary(dataset, graph_name: str): 
+    plt.figure(figsize=(12, 5))
+    tukey_result = pairwise_tukeyhsd(dataset[cs.COMPENSATION], dataset[cs.JOB_TITLE])
+    plt.tight_layout()
+    plt.xlabel(cs.COMPENSATION_AVERAGE_LABEL)
+    tukey_result.plot_simultaneous()
+    plt.subplots_adjust(left=0.35, right=0.95, top=0.9, bottom=0.1)
+    plt.savefig(f"{cs.DIAGRAM_OUTPUT_FOLDER}/{graph_name}.png")
+    plt.close()
+
+def createGroupByCountryBarGraphs(usa_data, canada_data, groupBy, graph_name): 
+    grouped_usa_data = usa_data.groupby(by=groupBy).agg({cs.COMPENSATION: "mean"}).reset_index()
+    grouped_canada_data = canada_data.groupby(by=groupBy).agg({cs.COMPENSATION: "mean"}).reset_index()
+    merged_usa_canada = pd.merge(grouped_usa_data, grouped_canada_data, on=groupBy, how='inner')
+    plt.figure(figsize=(10, 6))
+    plt.barh( merged_usa_canada[groupBy], merged_usa_canada[cs.COMPENSATION + "_x"], label=cs.USA)
+    plt.barh( merged_usa_canada[groupBy], merged_usa_canada[cs.COMPENSATION + "_y"], color='green', alpha=0.5, label=cs.CANADA)
+    plt.xlabel(cs.COMPENSATION_AVERAGE_LABEL)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(f"{cs.DIAGRAM_OUTPUT_FOLDER}/{graph_name}.png")
+    plt.close()
+
+
 def main():
     na_data = load_data(cs.NORTH_AMERICA_DATA)
     # rof_data = load_data(cs.NORTH_AMERICA_DATA)
-    na_data = na_data[(na_data[cs.COMPENSATION] < cs.INCOME_THRESHOLD)]
+
+    plt.scatter(na_data[cs.WORK_EXPERIENCE], na_data[cs.COMPENSATION], marker='.', color='blue')
+    plt.xlabel(cs.WORK_EXPERIENCE_LABEL)
+    plt.ylabel(cs.COMPENSATION_LABEL)
+    plt.savefig(f"{cs.DIAGRAM_OUTPUT_FOLDER}/{cs.EXP_VS_COMP_OUTLIER}.png")
+    plt.close()
+    
+    na_data = na_data[(na_data[cs.COMPENSATION] < cs.INCOME_THRESHOLD)]      # Eliminate outliers
 
     na_data[cs.YEARS_CODE_PRO] = pd.to_numeric(na_data[cs.YEARS_CODE_PRO], errors='coerce')
     regression_data = na_data.dropna(subset=[cs.WORK_EXPERIENCE, cs.COMPENSATION, cs.YEARS_CODE_PRO])
-    regression_data = regression_data[(regression_data[cs.COMPENSATION] < cs.INCOME_THRESHOLD)] # Eliminate outliers
 
     # Question 1: Does years of experience correlate to a developer's total compensation in NA and Canada 
     # in the North American job market?
     # 
-    # Tests used: Linear Regression    
-
+    # Tests used: Linear Regression. Should do it for canada and us too    
     plotLinearRegression(regression_data[cs.WORK_EXPERIENCE], regression_data[cs.COMPENSATION], cs.WORK_EXPERIENCE_LABEL, cs.COMPENSATION_LABEL, cs.EXP_VS_COMP)
-    regression_data = regression_data[(regression_data[cs.COUNTRY] == cs.USA)]
+
+    # Question 2: Are US employees paid more than Canadian employees
+    canada_data = regression_data[(regression_data[cs.COUNTRY] == cs.CANADA)]
+    usa_data = regression_data[(regression_data[cs.COUNTRY] == cs.USA)]
+    plotLinearRegression(canada_data[cs.WORK_EXPERIENCE], canada_data[cs.COMPENSATION], cs.WORK_EXPERIENCE_LABEL, cs.COMPENSATION_LABEL, cs.EXP_VS_COMP_CAN)
+    plotLinearRegression(usa_data[cs.WORK_EXPERIENCE], usa_data[cs.COMPENSATION], cs.WORK_EXPERIENCE_LABEL, cs.COMPENSATION_LABEL, cs.EXP_VS_COMP_USA)
+
+
+    print(f"size of canada data: {len(canada_data)}")
+    print(f"size of usa data: {len(usa_data)}")
+    print(f"Normality test for Canada Compensation: {st.normaltest(canada_data[cs.COMPENSATION])}")
+    print(f"Normality test for USA Compensation: {st.normaltest(usa_data[cs.COMPENSATION])}")
+
+    # As the normality test failed: we are doing mannwhitneyu
+    statistic, p_value = st.mannwhitneyu(canada_data[cs.COMPENSATION], usa_data[cs.COMPENSATION], alternative='two-sided')
+    print(f"p value for mannwhitneyu on Canada and usa Compensation: {p_value}") # Different so compensation groups are different 
+
     # plotLinearRegression(regression_data[cs.WORK_EXPERIENCE], regression_data[cs.COMPENSATION], cs.WORK_EXPERIENCE_LABEL, cs.COMPENSATION_LABEL, cs.EXP_VS_COMP_CAN)
 
     # No results... What about years of experience in relation to role/job title?
-    grouped_regression_data = regression_data.groupby(by=cs.JOB_TITLE).agg({cs.COMPENSATION: "mean"}).reset_index()
-    plt.figure(figsize=(10, 6))
-    plt.barh(grouped_regression_data[cs.JOB_TITLE], grouped_regression_data[cs.COMPENSATION])
-    plt.tight_layout()
-    plt.savefig("hist_try")
-    plt.close()
+    createGroupByCountryBarGraphs(usa_data, canada_data, cs.JOB_TITLE, cs.CAN_US_COMP_AVERAGE)
 
     job_titles = cs.CHOSEN_JOB_TITLES
     print(len(job_titles))
-
+    american_compensations = []
+    canadian_compensations = []
     
     for job in job_titles:
-        print(job)
-        job_df = regression_data[regression_data[cs.JOB_TITLE] == job].copy()
-        reg = st.linregress(job_df[cs.WORK_EXPERIENCE], job_df[cs.COMPENSATION])
-        print(f"{reg}")
+        american_jobs = usa_data[usa_data[cs.JOB_TITLE] == job].copy()
+        canadian_jobs = canada_data[canada_data[cs.JOB_TITLE] == job].copy()
         
+        american_compensations.append(american_jobs[cs.COMPENSATION])
+        canadian_compensations.append(canadian_jobs[cs.COMPENSATION])
+
+    american_anova = st.f_oneway(*american_compensations)
+    canadian_anova = st.f_oneway(*canadian_compensations)
+    print(f"ANOVA of job compensations: \nUSA: {american_anova}\nCanada: {canadian_anova}")
+    usa_data_chosen = usa_data[usa_data[cs.JOB_TITLE].isin(cs.CHOSEN_JOB_TITLES)]
+    canada_data_chosen = canada_data[canada_data[cs.JOB_TITLE].isin(cs.CHOSEN_JOB_TITLES)]
+
+    plotAnovaAverageSalary(usa_data_chosen, cs.USA_TUKEY_COMP)
+    plotAnovaAverageSalary(canada_data_chosen, cs.CAN_TUKEY_COMP)
+    
+    # Plot graphs for various job compensations
+
     # Data scientist or machine learning specialist
     #Engineering manager
-    
-    manager_data = regression_data[regression_data[cs.JOB_TITLE] == cs.DEVELOPER_MOBILE]
-    fullstack_data = regression_data[regression_data[cs.JOB_TITLE] == cs.DEVELOPER_FULLSTACK]
-    plotLinearRegression(manager_data[cs.WORK_EXPERIENCE], manager_data[cs.COMPENSATION], cs.WORK_EXPERIENCE_LABEL, cs.COMPENSATION_LABEL, cs.EXP_VS_COMP_US_MOBILE)     
-    plotLinearRegression(fullstack_data[cs.WORK_EXPERIENCE], fullstack_data[cs.COMPENSATION], cs.WORK_EXPERIENCE_LABEL, cs.COMPENSATION_LABEL, cs.EXP_VS_COMP_US_FULLSTACK)
-
-    
-    
-        
     # Does the years of experience of employees have a significant impact on a developers compensation, and does this relationship vary across different job titles?
     
-    # grouped_regression_data["cs.WORK_EXPERIENCE"] = (grouped_regression_data[cs.WORK_EXPERIENCE] - grouped_regression_data[cs.WORK_EXPERIENCE].min()) / (grouped_regression_data[cs.WORK_EXPERIENCE].max() - grouped_regression_data[cs.WORK_EXPERIENCE].min())
-    
-    # plotLinearRegression(regression_data[cs.WORK_EXPERIENCE], regression_data[cs.JOB_TITLE], cs.WORK_EXPERIENCE_LABEL, cs.JOB_TITLE_LABEL, cs.EXP_VS_JOBTITLE)
-
-    # There is also a column for years of coding... How does it correlate to years of experience and income?
-
-    # plotLinearRegression(regression_data[cs.YEARS_CODE], regression_data[cs.COMPENSATION], cs.YEARS_OF_CODE_LABEL)
-    
-    # Question 2: A persons favour of AI + years of experience and comparing to salary ?
+    # Question 3: A persons favour of AI + years of experience and comparing to salary ?
     #   
     # Tests used: This is for salary same could be done for work experience, it also had same results
     ai_data = na_data.dropna(subset=[cs.AISENT, cs.COMPENSATION])
     outcomes = ai_data[cs.AISENT].unique()
+    outcome_transformed_list = []
     outcome_list = []
+
     for outcome in outcomes:
         outcome_df = ai_data[ai_data[cs.AISENT] == outcome].copy()
-        outcome_df = outcome_df[[cs.COMPENSATION]] ** 0.5 # transform as it was skewed towards left and this fixes it
+        outcome_df = outcome_df[[cs.COMPENSATION]] # transform as it was skewed towards left and this fixes it
         outcome_list.append(outcome_df)
+        outcome_transformed_df = outcome_df[cs.COMPENSATION] ** 0.5
+        outcome_transformed_list.append(outcome_transformed_df)
 
     # These graphs are normal therefore could be shown to say data is normal and has many values so we decided to do Anova as mentioned in lecture
-    print(st.normaltest(outcome_list[1])) # this fails so we will say we continuted as a lot of data 
-    plt.hist(outcome_list[1], bins=10)
-    plt.show()
+    print(st.normaltest(outcome_list[1]))  # this fails so we will say we continuted as a lot of data
+    print(st.normaltest(outcome_transformed_list[1])) 
+    plotHistogram(outcome_list[1], cs.COMPENSATION_LABEL, cs.FREQUENCY_LABEL, cs.UNFAVOURABLE_LABEL, cs.AI_FAV_VS_COMP)
+    plotHistogram(outcome_transformed_list[1], cs.COMPENSATION_TRANSFORMED_LABEL, cs.FREQUENCY_LABEL, cs.UNFAVOURABLE_LABEL, cs.AI_FAV_VS_COMP_TRANSFORMED)
     
-    anova = st.f_oneway(*outcome_list).pvalue
+    anova = st.f_oneway(*outcome_transformed_list).pvalue
     # This was [0.00233371]
     print(anova)
     # Therefore some relationship between compensation and favourability to AI, so post-hoc analysis
@@ -112,11 +162,33 @@ def main():
     # therefore we will remove it
 
     # Do the exact same for Q3
-    
         
-    # Question 3: How likely will the user adopt AI technologies? And if so, which tools?
-    
-    # Question 4: For NA does a person know two kind of languages i.e if a person knows Java do they know JavaScript? (KNN or some kind of T-Test) 
+   
+    # Question 5: For NA does a person know two kind of languages i.e if a person knows Java do they know JavaScript? (KNN or some kind of T-Test) 
+
+    # print(canada_data['Industry'].unique())
+    # Industry
+    createGroupByCountryBarGraphs(usa_data, canada_data, cs.INDUSTRY, cs.CAN_US_INDUS_AVERAGE)
+    createGroupByCountryBarGraphs(usa_data, canada_data, cs.ORG_SIZE, cs.CAN_US_ORG_AVG)
+
+
+    # Organization size
+    grouped_usa_data = usa_data.groupby(by=cs.ORG_SIZE).size().reset_index(name=cs.FREQUENCY_LABEL)
+    grouped_canada_data = canada_data.groupby(by=cs.ORG_SIZE).size().reset_index(name=cs.FREQUENCY_LABEL)
+    merged_usa_canada = pd.merge(grouped_usa_data, grouped_canada_data, on=cs.ORG_SIZE, how='inner')
+    plt.figure(figsize=(10, 6))
+    plt.barh( merged_usa_canada[cs.ORG_SIZE], merged_usa_canada[f"{cs.FREQUENCY_LABEL}"+ "_x"], label=cs.USA)
+    plt.barh( merged_usa_canada[cs.ORG_SIZE], merged_usa_canada[f"{cs.FREQUENCY_LABEL}"+ "_y"], color='green', alpha=0.5, label=cs.CANADA)
+    plt.xlabel(cs.FREQUENCY_LABEL)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(f"{cs.DIAGRAM_OUTPUT_FOLDER}/{cs.CAN_US_ORG_FREQ}.png")
+    plt.close()
+
+    contingency_table = pd.crosstab(index=na_data[cs.COUNTRY], columns=na_data[cs.ORG_SIZE])
+    # print(contingency_table)
+    _, p_con_org, _, _ = st.chi2_contingency(contingency_table)
+    print(f"Chi-Square test on Country and oOrgSize : {p_con_org}")
     
     #Question 5: If anything comes up, think more in terms of where t-test or Anova is possible
 if __name__ == "__main__":
