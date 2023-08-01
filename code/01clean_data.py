@@ -91,13 +91,16 @@ def main():
     # rest_of_the_world = pd.concat([rest_of_the_world, ai_use_rest
     #                                ], axis =1)
 
-    north_america.drop(columns=cs.DROP_TECHNOLOGIES_LIST, axis=1)
-    rest_of_the_world.drop(columns=cs.DROP_TECHNOLOGIES_LIST, axis=1)
+    north_america = north_america.drop(columns=cs.DROP_TECHNOLOGIES_LIST, axis=1)
+    rest_of_the_world = rest_of_the_world.drop(columns=cs.DROP_TECHNOLOGIES_LIST, axis=1)
     
     # What is the top paying skill in each category?
     
 
     # How do these skills correlate with each other?
+    north_america[cs.AGE].replace(cs.AGE_GROUP_MAPPING, inplace=True)
+    north_america[cs.YEARS_CODE].replace(cs.YEARS_CODE_MAPPING, inplace=True)
+    north_america[cs.YEARS_CODE_PRO].replace(cs.YEARS_CODE_MAPPING, inplace=True)
     
 
     north_america.to_csv(f"{cs.NORTH_AMERICA_DATA}.csv", index=False)

@@ -1,4 +1,5 @@
 from enum import Enum
+import numpy as np
 
 DATA_PATH: str = "data_compressed.zip"
 FILENAME: str = "survey_results_public.csv"
@@ -6,24 +7,29 @@ FILENAME: str = "survey_results_public.csv"
 NORTH_AMERICA_DATA: str = "north_america"
 REST_OF_THE_WORLD_DATA: str = "rest_of_the_world"
 
+NA_TRAIN_DATA: str = "north_america_train"
+X_VALID: str = 'X_valid_data'
+Y_VALID: str = 'y_valid_data'
+
 # Keep Columns
 KEEP_COLUMNS: list = [
-    'MainBranch', 'Age', 'Employment', 'RemoteWork', 
-    'EdLevel', 'LearnCodeCoursesCert', 'YearsCode', 
-    'YearsCodePro', 'DevType', 'OrgSize', 'Country',
-    'Currency', 'CompTotal', 'LanguageHaveWorkedWith',
-    'DatabaseHaveWorkedWith','PlatformHaveWorkedWith',
+    'MainBranch', 'Age', 'Employment', 'RemoteWork', 'Currency',
+    'EdLevel', 'YearsCode', 'YearsCodePro', 'DevType', 'OrgSize', 'Country', 'CompTotal', 
+    'LanguageHaveWorkedWith','DatabaseHaveWorkedWith','PlatformHaveWorkedWith',
     'WebframeHaveWorkedWith', 'MiscTechHaveWorkedWith','ToolsTechHaveWorkedWith', 
-    'AISent','AISelect','WorkExp', 'ProfessionalTech', 'Industry'
+    'AISent', 'Industry'
 ]
 
 # Columns
+INDEX: str = "index"
 MAIN_BRANCH: str = 'MainBranch'
 COUNTRY: str = 'Country'
 EMPLOYMENT_TYPE: str = 'Employment'
+EDUCATION: str = 'EdLevel'
 CURRENCY: str = 'Currency'
 COMPENSATION: str = 'CompTotal'
 WORK_EXPERIENCE: str = 'WorkExp'
+YEARS_CODE: str = 'YearsCode'
 YEARS_CODE_PRO: str = 'YearsCodePro'
 LANGUAGES: str = 'LanguageHaveWorkedWith'
 DATABASES: str = 'DatabaseHaveWorkedWith'
@@ -36,6 +42,8 @@ USING_AI: str = 'AIToolCurrently Using'
 JOB_TITLE: str = 'DevType'
 INDUSTRY: str = 'Industry'
 ORG_SIZE: str = 'OrgSize'
+AGE: str = 'Age'
+REMOTE: str = 'RemoteWork'
 
 DROP_TECHNOLOGIES_LIST: list = [LANGUAGES, DATABASES, FRAMEWORKS, PLATFORMS, TOOLS, OTHER_TECH]
 
@@ -123,6 +131,83 @@ CAN_US_ORG_AVG: str = '04-can_vs_us_org_avg'
 CAN_US_ORG_FREQ: str = '04-can_vs_us_org_freq'
 CAN_TUKEY_COMP: str = '04-can_tukey_comp'
 USA_TUKEY_COMP: str = '04-usa_tukey_comp'
+CAN_TUKEY_COMP_INDUS: str = '04-can_tukey_comp_indus'
+USA_TUKEY_COMP_INDUS: str = '04-usa_tukey_comp_indus'
+CAN_TUKEY_COMP_EDU: str = '04-can_tukey_comp_edu'
+USA_TUKEY_COMP_EDU: str = '04-usa_tukey_comp_edu'
 
 # Output folders
 DIAGRAM_OUTPUT_FOLDER: str = "./diagrams"
+ML_MODELS_FOLDER: str = "./ml_models"
+
+# ML encodings to convert to numeric for training
+AGE_GROUP_MAPPING: dict = {
+    'Under 18 years old': 1,
+    '18-24 years old': 2,
+    '25-34 years old': 3,
+    '35-44 years old': 4,
+    '45-54 years old': 5,
+    '55-64 years old': 6,
+    '65 years or older': 7,
+    'Prefer not to say': 8
+}
+
+YEARS_CODE_MAPPING: dict = {
+    "More than 50 years": 55,
+    "Less than 1 years": 0.5,
+    "Less than 1 year": 0.5
+}
+
+EDUCATION_LEVEL_MAPPING: dict = {
+    'Bachelor’s degree (B.A., B.S., B.Eng., etc.)': 0,
+    'Some college/university study without earning a degree': 1,
+    'Master’s degree (M.A., M.S., M.Eng., MBA, etc.)': 2,
+    'Something else': 3,
+    'Professional degree (JD, MD, Ph.D, Ed.D, etc.)': 4,
+    'Secondary school (e.g. American high school, German Realschule or Gymnasium, etc.)': 5,
+    'Associate degree (A.A., A.S., etc.)': 6,
+    'Primary/elementary school': 7,
+    np.nan: - 1,
+}
+
+INDUSTRY_MAPPING: dict = {
+    'Information Services, IT, Software Development, or other Technology': 0,
+    'Financial Services': 1,
+    'Other': 2,
+    'Manufacturing, Transportation, or Supply Chain': 3,
+    'Oil & Gas': 4,
+    'Healthcare': 5,
+    'Insurance': 6,
+    'Higher Education': 7,
+    'Retail and Consumer Services': 8,
+    'Advertising Services': 9,
+    'Legal Services': 10,
+    'Wholesale': 11,
+    np.nan: - 1,
+}
+
+COUNTRY_MAPPING = {
+    'United States of America': 0,
+    'Canada': 1
+}
+
+TRAINING_SCORE: str = "train_score"
+VALIDATION_SCORE: str = "valid_score"
+
+RANDOM_FOREST_MODELS: str = "Random_forest_models"
+SVR_MODELS: str = "SVR_models"
+GB_MODELS: str = "Random_forest_models"
+XGBOOST_MODELS: str = "XGBoost_models"
+
+BEST_RF_MODELS: str = 'best_rf_models'
+BEST_SVR_MODELS: str = 'best_svr_models'
+BEST_GB_MODELS: str = 'best_gb_models'
+BEST_XGBOOST_MODELS: str = 'best_xgboost_models'
+
+
+
+
+
+
+
+
