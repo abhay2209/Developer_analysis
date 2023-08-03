@@ -106,15 +106,20 @@ ALL_FRAMEWORK = ['JavaScript', 'SQL', 'HTML/CSS', 'Python', 'TypeScript',
        'React Native', 'Scikit-Learn', 'Torch/PyTorch']
 
 # Plot labels
-COMPENSATION_LABEL: str = 'Compensation'
+COMPENSATION_LABEL: str = 'Compensation (CAD)'
 COMPENSATION_TRANSFORMED_LABEL: str = 'Compensation Transformed'
 COMPENSATION_AVERAGE_LABEL: str = 'Average Compensation'
-WORK_EXPERIENCE_LABEL: str = 'Work Experience'
+WORK_EXPERIENCE_LABEL: str = 'Work Experience (Years)'
 YEARS_OF_CODE_LABEL:str = "Years of Coding"
 AI_SENT_LABEL: str = "AI Sentiment"
 JOB_TITLE_LABEL: str = 'Job title'
 UNFAVOURABLE_LABEL: str = 'Unfavourable'
 FREQUENCY_LABEL: str = 'Frequency'
+
+# Titles
+REGRESSION_ALL_DATA: str = 'Work Experience VS. Compensation (North America)'
+REGRESSION_USA_DATA: str = 'Work Experience VS. Compensation (USA)'
+REGRESSION_CANADA_DATA: str = 'Work Experience VS. Compensation (CANADA)'
 
 # Output filenames
 EXP_VS_COMP_OUTLIER: str = 'yoe_vs_income_outliers'

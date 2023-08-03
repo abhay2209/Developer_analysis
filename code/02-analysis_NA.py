@@ -14,29 +14,44 @@ def load_data(filename: str) -> pd.DataFrame:
         with data_zip.open(f"{filename}.csv") as developer_data:
             return pd.read_csv(developer_data)
         
-def plotLinearRegression(x_data, y_data, x_label: str, y_label: str, graph_name: str): 
+def plotLinearRegression(x_data, y_data, x_label: str, y_label: str, graph_name: str, title: str): 
     reg = st.linregress(x_data, y_data)
     prediction = reg.slope * x_data + reg.intercept
     print(reg)
-    plt.scatter(x_data, y_data, marker='.', color='blue')
-    plt.plot(x_data, prediction, 'r-')
+    residuals = y_data - prediction
+    plt.figure(figsize=(8, 5))
+    plt.title(title)
+    plt.scatter(x_data, y_data, marker='.', color='blue', label='Compensation')
+    plt.plot(x_data, prediction, 'r-', label='Regression Line (predictions)')
+    plt.legend()
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     
     plt.savefig(f"{cs.DIAGRAM_OUTPUT_FOLDER}/{graph_name}.png")
     plt.close()
 
+    # Plot residuals
+    plt.hist(residuals, bins=30, density=True, color='blue', alpha=0.7, label='y_true - prediction')
+    plt.legend()
+    plt.xlabel(cs.COMPENSATION_LABEL)
+    plt.ylabel('Residuals')
+    plt.title(f'Residual Histogram')
+    plt.savefig(f"{cs.DIAGRAM_OUTPUT_FOLDER}/{graph_name}_residuals.png")
+    plt.close()
+    print(f"normality test on residuals{st.normaltest(residuals)}")
+
 def plotHistogram(data, x_label: str, y_label, title: str, graph_name: str):
-    plt.hist(data, bins=12)
+    plt.hist(data, bins=12, label='Compensation Frequency')
     plt.xlabel(x_label)
     plt.ylabel(y_label)
+    plt.legend()
     plt.title(title)
     plt.savefig(f"{cs.DIAGRAM_OUTPUT_FOLDER}/{graph_name}.png")
     plt.close()
 
 def plotAnovaAverageSalary(dataset, graph_name: str, feature_compared: str): 
     plt.figure(figsize=(12, 5))
-    tukey_result = pairwise_tukeyhsd(dataset[cs.COMPENSATION], dataset[feature_compared])
+    tukey_result = pairwise_tukeyhsd(dataset[cs.COMPENSATION] ** 0.5, dataset[feature_compared])
     plt.tight_layout()
     plt.xlabel(cs.COMPENSATION_AVERAGE_LABEL)
     tukey_result.plot_simultaneous()
@@ -64,20 +79,33 @@ def anovaTestIterator(value_list: list, usa_data, canada_data, X_data: str, Y_da
         american_jobs = usa_data[usa_data[X_data] == value].copy()
         canadian_jobs = canada_data[canada_data[X_data] == value].copy()
         
-        american_compensations.append(american_jobs[Y_data])
-        canadian_compensations.append(canadian_jobs[Y_data])
+        american_compensations.append(american_jobs[Y_data] ** 0.5)
+        canadian_compensations.append(canadian_jobs[Y_data] ** 0.5)
+    
+    # Showing one example of Levene's test for the first two groups
+    print(f"Levene Test America {st.levene(american_compensations[0], american_compensations[1])}")
+    print(f"Levene Test Canada {st.levene(canadian_compensations[0], canadian_compensations[1])}")
+
+    plotHistogram(american_compensations[1], f"{Y_data} ({value_list[1]})", X_data, f"{X_data}_VS._{Y_data}", f"{X_data}_VS._{Y_data}")
 
     american_anova = st.f_oneway(*american_compensations)
     canadian_anova = st.f_oneway(*canadian_compensations)
     print(f"ANOVA of job compensations for {X_data}: \nUSA: {american_anova}\nCanada: {canadian_anova}")
+    # usa_data = usa_data.dropna(subset=[X_data, cs.COMPENSATION])
+    # tukey_result = pairwise_tukeyhsd(usa_data[cs.COMPENSATION] ** 0.5, usa_data[X_data])
+    # print(tukey_result)
 
 
 def main():
     na_data = load_data(cs.NORTH_AMERICA_DATA)
     # rof_data = load_data(cs.NORTH_AMERICA_DATA)
+    print(na_data[(na_data[cs.COUNTRY] == cs.CANADA)].shape)
+    print(na_data[(na_data[cs.COUNTRY] == cs.USA)].shape)
 
-    plt.scatter(na_data[cs.YEARS_CODE_PRO], na_data[cs.COMPENSATION], marker='.', color='blue')
-    plt.xlabel(cs.YEARS_CODE_PRO)
+    plt.scatter(na_data[cs.YEARS_CODE_PRO], na_data[cs.COMPENSATION], marker='.', color='blue', label='Compensation')
+    plt.title('Work Experience vs Compensation')
+    plt.legend()
+    plt.xlabel(cs.WORK_EXPERIENCE_LABEL)
     plt.ylabel(cs.COMPENSATION_LABEL)
     plt.savefig(f"{cs.DIAGRAM_OUTPUT_FOLDER}/{cs.EXP_VS_COMP_OUTLIER}.png")
     plt.close()
@@ -92,13 +120,13 @@ def main():
     # in the North American job market?
     # 
     # Tests used: Linear Regression. Should do it for canada and us too    
-    plotLinearRegression(regression_data[cs.YEARS_CODE_PRO], regression_data[cs.COMPENSATION], cs.WORK_EXPERIENCE_LABEL, cs.COMPENSATION_LABEL, cs.EXP_VS_COMP)
+    plotLinearRegression(regression_data[cs.YEARS_CODE_PRO], regression_data[cs.COMPENSATION], cs.WORK_EXPERIENCE_LABEL, cs.COMPENSATION_LABEL, cs.EXP_VS_COMP, cs.REGRESSION_ALL_DATA)
 
     # Question 2: Are US employees paid more than Canadian employees
     canada_data = regression_data[(regression_data[cs.COUNTRY] == cs.CANADA)]
     usa_data = regression_data[(regression_data[cs.COUNTRY] == cs.USA)]
-    plotLinearRegression(canada_data[cs.YEARS_CODE_PRO], canada_data[cs.COMPENSATION], cs.WORK_EXPERIENCE_LABEL, cs.COMPENSATION_LABEL, cs.EXP_VS_COMP_CAN)
-    plotLinearRegression(usa_data[cs.YEARS_CODE_PRO], usa_data[cs.COMPENSATION], cs.WORK_EXPERIENCE_LABEL, cs.COMPENSATION_LABEL, cs.EXP_VS_COMP_USA)
+    plotLinearRegression(canada_data[cs.YEARS_CODE_PRO], canada_data[cs.COMPENSATION], cs.WORK_EXPERIENCE_LABEL, cs.COMPENSATION_LABEL, cs.EXP_VS_COMP_CAN, cs.REGRESSION_CANADA_DATA)
+    plotLinearRegression(usa_data[cs.YEARS_CODE_PRO], usa_data[cs.COMPENSATION], cs.WORK_EXPERIENCE_LABEL, cs.COMPENSATION_LABEL, cs.EXP_VS_COMP_USA, cs.REGRESSION_USA_DATA)
 
 
     print(f"size of canada data: {len(canada_data)}")
@@ -183,10 +211,9 @@ def main():
     #Anova test b/w Education vs Compensation: 
     educ_comp_data = na_data.dropna(subset=[cs.EDUCATION, cs.COMPENSATION])
     education = educ_comp_data[cs.EDUCATION].unique()
-    print(len(education))
+    # print(len(education))
     
     anovaTestIterator(education, usa_data, canada_data, cs.EDUCATION, cs.COMPENSATION)
-   
     plotAnovaAverageSalary(usa_data, cs.USA_TUKEY_COMP_EDU, cs.EDUCATION)
     plotAnovaAverageSalary(canada_data, cs.CAN_TUKEY_COMP_EDU, cs.EDUCATION)
     

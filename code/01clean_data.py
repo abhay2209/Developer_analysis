@@ -21,7 +21,7 @@ def filterData(stackoverflow_data: pd.DataFrame, northAmerica: bool) -> pd.DataF
     return result[(
         (result[cs.MAIN_BRANCH] == cs.DEVELOPERS) & 
         (result[cs.EMPLOYMENT_TYPE].str.contains(cs.EMPLOYED_PART_TIME) | result[cs.EMPLOYMENT_TYPE].str.contains(cs.EMPLOYED_FULL_TIME)) 
-        )].drop(cs.MAIN_BRANCH, axis=1).dropna(subset = [cs.COMPENSATION, cs.COMPENSATION], how="all").reset_index()
+        )].drop(cs.MAIN_BRANCH, axis=1).dropna(subset = [cs.COMPENSATION], how="all").reset_index()
 
         
 def convertCurrencyToCanadian(currency: str, value: float) -> float:
