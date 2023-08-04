@@ -55,7 +55,8 @@ def plotAnovaAverageSalary(dataset, graph_name: str, feature_compared: str):
     plt.tight_layout()
     plt.xlabel(cs.COMPENSATION_AVERAGE_LABEL)
     tukey_result.plot_simultaneous()
-    plt.subplots_adjust(left=0.35, right=0.95, top=0.9, bottom=0.1)
+    plt.subplots_adjust(left=0.50, right=0.95, top=0.9, bottom=0.1)
+    plt.xlabel(cs.COMPENSATION_AVERAGE_TRANSFORMED_LABEL)
     plt.savefig(f"{cs.DIAGRAM_OUTPUT_FOLDER}/{graph_name}.png")
     plt.close()
 

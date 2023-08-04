@@ -108,7 +108,8 @@ ALL_FRAMEWORK = ['JavaScript', 'SQL', 'HTML/CSS', 'Python', 'TypeScript',
 # Plot labels
 COMPENSATION_LABEL: str = 'Compensation (CAD)'
 COMPENSATION_TRANSFORMED_LABEL: str = 'Compensation Transformed'
-COMPENSATION_AVERAGE_LABEL: str = 'Average Compensation'
+COMPENSATION_AVERAGE_LABEL: str = 'Average Compensation (CAD)'
+COMPENSATION_AVERAGE_TRANSFORMED_LABEL: str = 'Average Compensation Sqrt-Transformed (CAD)'
 WORK_EXPERIENCE_LABEL: str = 'Work Experience (Years)'
 YEARS_OF_CODE_LABEL:str = "Years of Coding"
 AI_SENT_LABEL: str = "AI Sentiment"
@@ -201,7 +202,7 @@ VALIDATION_SCORE: str = "valid_score"
 
 RANDOM_FOREST_MODELS: str = "Random_forest_models"
 SVR_MODELS: str = "SVR_models"
-GB_MODELS: str = "Random_forest_models"
+GB_MODELS: str = "GB_models"
 XGBOOST_MODELS: str = "XGBoost_models"
 
 BEST_RF_MODELS: str = 'best_rf_models'
