@@ -1,4 +1,37 @@
 # Steps to run
+In your repository's README (or README.md) file, you should document your code and how to run it: required libraries, commands (and arguments), order of execution, files produced/expected. You should do this because (1) you should always do that, and (2) to give us some hope of running your code.
+
+## Required modules: 
+Uncommon ones are marked with * which might need installing
+1. pandas
+2. numpy
+3. * forex-python 
+4. sklearn
+5. * xgboost 
+6. mathplotlib
+7. zipfile
+8. joblib
+9. statsmodel
+10. scipy
+
+To load the models, use the mentioned version for the modules below:
+1. sklearn version = 1.0.2
+2. xgboost version = 1.7.6
+
+
+## Steps to follow: 
+All datasets created have been saved to be used for the next step. The best machine learning models have been saved so the grid 
+
+1. Cleaning data
+
+To run the clean data step, run the following command in the ```code``` directory
+
+    ```01clean_data.py``` 
+2. 
+
+
+
+
 
 # Development Diary
 
