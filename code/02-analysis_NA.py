@@ -100,9 +100,8 @@ def anovaTestIterator(value_list: list, usa_data, canada_data, X_data: str, Y_da
 def main():
     na_data = load_data(cs.NORTH_AMERICA_DATA)
     # rof_data = load_data(cs.NORTH_AMERICA_DATA)
-    print(na_data[(na_data[cs.COUNTRY] == cs.CANADA)].shape)
-    print(na_data[(na_data[cs.COUNTRY] == cs.USA)].shape)
 
+    #Graph raw data vs Comparison
     plt.scatter(na_data[cs.YEARS_CODE_PRO], na_data[cs.COMPENSATION], marker='.', color='blue', label='Compensation')
     plt.title('Work Experience vs Compensation')
     plt.legend()
@@ -111,16 +110,21 @@ def main():
     plt.savefig(f"{cs.DIAGRAM_OUTPUT_FOLDER}/{cs.EXP_VS_COMP_OUTLIER}.png")
     plt.close()
     
-    na_data = na_data[(na_data[cs.COMPENSATION] < cs.INCOME_THRESHOLD)]      # Eliminate outliers
+    # Eliminate outliers
+    na_data = na_data[(na_data[cs.COMPENSATION] < cs.INCOME_THRESHOLD)]      
 
+    #Convert to Numeric Data
     na_data[cs.YEARS_CODE_PRO] = pd.to_numeric(na_data[cs.YEARS_CODE_PRO], errors='coerce')
     na_data[cs.COMPENSATION] = pd.to_numeric(na_data[cs.COMPENSATION], errors='coerce')
+
+    #Drop Null Columns
     regression_data = na_data.dropna(subset=[cs.COMPENSATION, cs.YEARS_CODE_PRO, cs.INDUSTRY, cs.EDUCATION])
 
+    #Beginning Analysis
     # Question 1: Does years of experience correlate to a developer's total compensation in NA and Canada 
     # in the North American job market?
-    # 
-    # Tests used: Linear Regression. Should do it for canada and us too    
+
+    # Tests used: Linear Regression.
     plotLinearRegression(regression_data[cs.YEARS_CODE_PRO], regression_data[cs.COMPENSATION], cs.WORK_EXPERIENCE_LABEL, cs.COMPENSATION_LABEL, cs.EXP_VS_COMP, cs.REGRESSION_ALL_DATA)
 
     # Question 2: Are US employees paid more than Canadian employees
@@ -129,9 +133,6 @@ def main():
     plotLinearRegression(canada_data[cs.YEARS_CODE_PRO], canada_data[cs.COMPENSATION], cs.WORK_EXPERIENCE_LABEL, cs.COMPENSATION_LABEL, cs.EXP_VS_COMP_CAN, cs.REGRESSION_CANADA_DATA)
     plotLinearRegression(usa_data[cs.YEARS_CODE_PRO], usa_data[cs.COMPENSATION], cs.WORK_EXPERIENCE_LABEL, cs.COMPENSATION_LABEL, cs.EXP_VS_COMP_USA, cs.REGRESSION_USA_DATA)
 
-
-    print(f"size of canada data: {len(canada_data)}")
-    print(f"size of usa data: {len(usa_data)}")
     print(f"Normality test for Canada Compensation: {st.normaltest(canada_data[cs.COMPENSATION])}")
     print(f"Normality test for USA Compensation: {st.normaltest(usa_data[cs.COMPENSATION])}")
 
@@ -144,7 +145,6 @@ def main():
     # No results... What about years of experience in relation to role/job title?
     createGroupByCountryBarGraphs(usa_data, canada_data, cs.JOB_TITLE, cs.CAN_US_COMP_AVERAGE)
     job_titles = cs.CHOSEN_JOB_TITLES
-    print(len(job_titles))
     anovaTestIterator(job_titles, usa_data, canada_data, cs.JOB_TITLE, cs.COMPENSATION)
 
     usa_data_chosen = usa_data[usa_data[cs.JOB_TITLE].isin(cs.CHOSEN_JOB_TITLES)]
@@ -153,9 +153,6 @@ def main():
     plotAnovaAverageSalary(canada_data_chosen, cs.CAN_TUKEY_COMP, cs.JOB_TITLE)
     
     # Plot graphs for various job compensations
-
-    # Data scientist or machine learning specialist
-    #Engineering manager
     # Does the years of experience of employees have a significant impact on a developers compensation, and does this relationship vary across different job titles?
     
     # Question 3: A persons favour of AI + years of experience and comparing to salary ?
@@ -189,36 +186,28 @@ def main():
 
     # This gave us a relationship between unsure and very favourable therefore we can say we got nothing in regards to compensation
     # therefore we will remove 
-        
-   
-    # Question 5: For NA does a person know two kind of languages i.e if a person knows Java do they know JavaScript? (KNN or some kind of T-Test) 
+    # Question: For NA does a person know two kind of languages i.e if a person knows Java do they know JavaScript? (KNN or some kind of T-Test) 
 
-    # print(canada_data['Industry'].unique())
-    # Industry
     createGroupByCountryBarGraphs(usa_data, canada_data, cs.INDUSTRY, cs.CAN_US_INDUS_AVERAGE)
     createGroupByCountryBarGraphs(usa_data, canada_data, cs.ORG_SIZE, cs.CAN_US_ORG_AVG)
 
     #Anova test b/w industry vs Compensation: 
     ind_comp_data = na_data.dropna(subset=[cs.INDUSTRY, cs.COMPENSATION])
     industries = ind_comp_data[cs.INDUSTRY].unique()
-    print(len(industries))
-    
+
     anovaTestIterator(industries, usa_data, canada_data, cs.INDUSTRY, cs.COMPENSATION)
    
-
     plotAnovaAverageSalary(usa_data, cs.USA_TUKEY_COMP_INDUS, cs.INDUSTRY)
     plotAnovaAverageSalary(canada_data, cs.CAN_TUKEY_COMP_INDUS, cs.INDUSTRY)
 
     #Anova test b/w Education vs Compensation: 
     educ_comp_data = na_data.dropna(subset=[cs.EDUCATION, cs.COMPENSATION])
     education = educ_comp_data[cs.EDUCATION].unique()
-    # print(len(education))
     
     anovaTestIterator(education, usa_data, canada_data, cs.EDUCATION, cs.COMPENSATION)
     plotAnovaAverageSalary(usa_data, cs.USA_TUKEY_COMP_EDU, cs.EDUCATION)
     plotAnovaAverageSalary(canada_data, cs.CAN_TUKEY_COMP_EDU, cs.EDUCATION)
     
-
     # Organization size
     grouped_usa_data = usa_data.groupby(by=cs.ORG_SIZE).size().reset_index(name=cs.FREQUENCY_LABEL)
     grouped_canada_data = canada_data.groupby(by=cs.ORG_SIZE).size().reset_index(name=cs.FREQUENCY_LABEL)
@@ -232,11 +221,10 @@ def main():
     plt.savefig(f"{cs.DIAGRAM_OUTPUT_FOLDER}/{cs.CAN_US_ORG_FREQ}.png")
     plt.close()
 
+    #chi-square tests
     contingency_table = pd.crosstab(index=na_data[cs.COUNTRY], columns=na_data[cs.ORG_SIZE])
-    # print(contingency_table)
     _, p_con_org, _, _ = st.chi2_contingency(contingency_table)
-    print(f"Chi-Square test on Country and oOrgSize : {p_con_org}")
+    print(f"Chi-Square test on Country and orgSize : {p_con_org}")
     
-    #Question 5: If anything comes up, think more in terms of where t-test or Anova is possible
 if __name__ == "__main__":
     main()
