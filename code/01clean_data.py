@@ -83,20 +83,9 @@ def main():
                                    splitDataIntoCols(rest_of_the_world, cs.PLATFORMS, cs.TOP_10_PLATFORM),
                                    splitDataIntoCols(rest_of_the_world, cs.OTHER_TECH, cs.TOP_10_OTHER_TECH)], axis = 1)
 
-    # How is AI used by devs
-    # ai_use_na =  north_america[cs.USING_AI].str.get_dummies(sep=';')    
-    # north_america = pd.concat([north_america, ai_use_na], axis =1)
-
-    # ai_use_rest = rest_of_the_world[cs.USING_AI].str.get_dummies(sep=';')       
-    # rest_of_the_world = pd.concat([rest_of_the_world, ai_use_rest
-    #                                ], axis =1)
-
     north_america = north_america.drop(columns=cs.DROP_TECHNOLOGIES_LIST, axis=1)
     rest_of_the_world = rest_of_the_world.drop(columns=cs.DROP_TECHNOLOGIES_LIST, axis=1)
     
-    # What is the top paying skill in each category?
-    
-
     # How do these skills correlate with each other?
     north_america[cs.AGE].replace(cs.AGE_GROUP_MAPPING, inplace=True)
     north_america[cs.YEARS_CODE].replace(cs.YEARS_CODE_MAPPING, inplace=True)
